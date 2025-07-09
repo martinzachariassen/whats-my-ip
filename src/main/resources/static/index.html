@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What's My IP?</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Colors (din palett) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#264653",
+            secondary: "#2a9d8f",
+            highlight: "#e9c46a",
+            accent: "#f4a261",
+            warning: "#e76f51",
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Optional: Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-primary text-white min-h-screen flex items-center justify-center px-4">
+<div class="bg-white text-primary rounded-3xl shadow-2xl p-10 md:p-16 w-full max-w-3xl">
+  <div class="flex flex-col items-center text-center gap-8">
+    <!-- IP Address (click to copy) -->
+    <div class="relative text-center">
+      <p class="text-sm text-secondary uppercase tracking-widest mb-2">Your Public IP</p>
+
+      <h1
+          id="ip"
+          class="text-5xl md:text-7xl font-extrabold text-accent cursor-pointer transition transform duration-200"
+          onclick="copyIp(this)"
+      >
+        ...
+      </h1>
+
+      <p id="copy-hint" class="text-sm text-gray-400 mt-1 transition-opacity duration-200">
+        Click to copy
+      </p>
+    </div>
+
+    <!-- Other Details -->
+    <div class="text-left w-full max-w-sm space-y-2">
+      <div class="flex justify-between">
+        <span class="font-semibold text-secondary">City:</span>
+        <span id="city" class="text-gray-700">...</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold text-secondary">Country:</span>
+        <span id="country" class="text-gray-700">...</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold text-secondary">ISP:</span>
+        <span id="isp" class="text-gray-700">...</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold text-secondary">VPN:</span>
+        <span id="vpn" class="text-gray-700">...</span>
+      </div>
+    </div>
+
+    <p id="error" class="text-warning text-sm mt-4 hidden">⚠️ Failed to load IP info</p>
+  </div>
+</div>
+
+<script>
+  fetch("/api/lookup")
+  .then((res) => res.json())
+  .then((data) => {
+    document.getElementById("ip").textContent = data.ip || "N/A";
+    document.getElementById("city").textContent = data.city || "N/A";
+    document.getElementById("country").textContent = data.country || "N/A";
+    document.getElementById("isp").textContent = data.isp || "N/A";
+    document.getElementById("vpn").textContent = data.isVpn ? "Yes" : "No";
+  })
+  .catch(() => {
+    document.getElementById("error").classList.remove("hidden");
+  });
+
+  function copyIp(element) {
+    const ip = element.textContent;
+    navigator.clipboard.writeText(ip).then(() => {
+      // Animate press-down
+      element.classList.add("scale-95");
+
+      // Change text
+      const hint = document.getElementById("copy-hint");
+      hint.textContent = "Copied!";
+      hint.classList.remove("text-gray-400");
+      hint.classList.add("text-highlight");
+
+      // Reset after short delay
+      setTimeout(() => {
+        element.classList.remove("scale-95");
+        hint.textContent = "Click to copy";
+        hint.classList.remove("text-highlight");
+        hint.classList.add("text-gray-400");
+      }, 1500);
+    });
+  }
+</script>
+</body>
+</html>
