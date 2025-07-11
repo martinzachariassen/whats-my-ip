@@ -1,6 +1,7 @@
 package no.zachen.whatsmyip.service;
 
 import no.zachen.whatsmyip.dto.BasicIpInfo;
+import no.zachen.whatsmyip.dto.IpApiResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -23,18 +24,5 @@ public class GeoLocationService {
             response.org(),
             response.security() != null && response.security().is_vpn()
         ));
-  }
-
-  // DTO for ipapi.co svar
-  private record IpApiResponse(
-      String city,
-      String country_name,
-      String org,
-      Security security
-  ) {
-
-    private record Security(boolean is_vpn) {
-
-    }
   }
 }
